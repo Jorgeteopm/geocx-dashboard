@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEO-CX QA Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0d1117;
+    --bg2:       #161b22;
+    --bg3:       #1c2230;
+    --border:    rgba(255,255,255,0.07);
+    --border2:   rgba(255,255,255,0.13);
+    --cyan:      #00e5c8;
+    --cyan-dim:  rgba(0,229,200,0.12);
+    --cyan-glow: rgba(0,229,200,0.25);
+    --amber:     #f5a623;
+    --amber-dim: rgba(245,166,35,0.12);
+    --red:       #ff4d6d;
+    --green:     #39d98a;
+    --text:      #e6edf3;
+    --muted:     #7d8590;
+    --font-head: 'Rajdhani', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── GRID LINES BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,200,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,200,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 3rem;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .logo-ring {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 18px var(--cyan-glow), inset 0 0 10px var(--cyan-dim);
+    animation: pulse-ring 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-ring {
+    0%, 100% { box-shadow: 0 0 18px var(--cyan-glow), inset 0 0 10px var(--cyan-dim); }
+    50% { box-shadow: 0 0 28px rgba(0,229,200,0.45), inset 0 0 16px rgba(0,229,200,0.2); }
+  }
+
+  .logo-ring svg { width: 28px; height: 28px; fill: var(--cyan); }
+
+  .header-text h1 {
+    font-family: var(--font-head);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .header-text h1 span { color: var(--cyan); }
+
+  .header-text p {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .header-badge {
+    margin-left: auto;
+    font-family: var(--font-head);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    background: var(--cyan-dim);
+    border: 1px solid rgba(0,229,200,0.3);
+    padding: 4px 12px;
+    border-radius: 2px;
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: var(--font-head);
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── CARDS GRID ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  @media (min-width: 600px) {
+    .cards-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .card {
+    position: relative;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.4rem 1.2rem 1.2rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.18s;
+    cursor: pointer;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    transition: opacity 0.2s;
+    opacity: 0;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border2);
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  /* Per-card accent colors */
+  .card-backlog::before { background: var(--amber); }
+  .card-backlog:hover { border-color: rgba(245,166,35,0.35); }
+  .card-backlog .card-icon { color: var(--amber); background: var(--amber-dim); }
+  .card-backlog .card-num { color: var(--amber); }
+
+  .card-testing::before { background: #818cf8; }
+  .card-testing:hover { border-color: rgba(129,140,248,0.35); }
+  .card-testing .card-icon { color: #818cf8; background: rgba(129,140,248,0.12); }
+  .card-testing .card-num { color: #818cf8; }
+
+  .card-projects::before { background: var(--cyan); }
+  .card-projects:hover { border-color: var(--cyan-glow); }
+  .card-projects .card-icon { color: var(--cyan); background: var(--cyan-dim); }
+  .card-projects .card-num { color: var(--cyan); }
+
+  .card-complete::before { background: var(--green); }
+  .card-complete:hover { border-color: rgba(57,217,138,0.35); }
+  .card-complete .card-icon { color: var(--green); background: rgba(57,217,138,0.12); }
+  .card-complete .card-num { color: var(--green); }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+
+  .card-label {
+    font-family: var(--font-head);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .card-desc {
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .card-arrow {
+    align-self: flex-end;
+    font-size: 0.7rem;
+    color: var(--muted);
+    transition: color 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-head);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .card:hover .card-arrow {
+    color: inherit;
+    transform: translateX(3px);
+  }
+
+  .card-backlog:hover .card-arrow { color: var(--amber); }
+  .card-testing:hover .card-arrow { color: #818cf8; }
+  .card-projects:hover .card-arrow { color: var(--cyan); }
+  .card-complete:hover .card-arrow { color: var(--green); }
+
+  /* ── CORNER DECORATIONS ── */
+  .card-corner {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 14px; height: 14px;
+    border-top: 1px solid var(--border2);
+    border-right: 1px solid var(--border2);
+    opacity: 0.5;
+  }
+
+  /* ── DIAGRAMS ROW ── */
+  .roles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .role-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .role-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+  }
+
+  .role-name {
+    font-family: var(--font-head);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+
+  .role-tag {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.85rem 1.2rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .status-text {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    font-family: var(--font-head);
+    text-transform: uppercase;
+  }
+
+  .status-text strong { color: var(--green); font-weight: 600; }
+
+  .status-spacer { flex: 1; }
+
+  .status-version {
+    font-family: var(--font-head);
+    font-size: 0.65rem;
+    color: var(--border2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-ring">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>GEO<span>-CX</span> QA</h1>
+      <p>Quality Assurance Dashboard</p>
+    </div>
+    <div class="header-badge">Live</div>
+  </header>
+
+  <!-- NAV CARDS -->
+  <div class="section-label">Navigation</div>
+  <div class="cards-grid">
+
+    <a class="card card-backlog" href="https://app.smartsheet.com/sheets/Qm36qjF68MjrjpmMc27fMFCqq7CG6rgrfJJ7X4g1?view=grid" target="_blank">
+      <div class="card-corner"></div>
+      <div class="card-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+      </div>
+      <div class="card-label">Backlog</div>
+      <div class="card-desc">Tickets pendientes y tareas en cola de desarrollo</div>
+      <div class="card-arrow">Abrir →</div>
+    </a>
+
+    <a class="card card-testing" href="https://app.smartsheet.com/sheets/QwpC9rM88J6xM7Hx6jfw2CX6577R4VgcR6jH6WH1?view=grid" target="_blank">
+      <div class="card-corner"></div>
+      <div class="card-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>
+        </svg>
+      </div>
+      <div class="card-label">Testing</div>
+      <div class="card-desc">Casos de prueba y resultados de QA en curso</div>
+      <div class="card-arrow">Abrir →</div>
+    </a>
+
+    <a class="card card-projects" href="https://app.smartsheet.com/sheets/8cCJPGVXcpmvQHxvqq2vfc75cWcgwwxwMjPGPjv1?view=grid" target="_blank">
+      <div class="card-corner"></div>
+      <div class="card-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="6" height="6" rx="1"/><rect x="16" y="3" width="6" height="6" rx="1"/><rect x="9" y="3" width="6" height="6" rx="1"/><rect x="2" y="15" width="6" height="6" rx="1"/><rect x="16" y="15" width="6" height="6" rx="1"/><rect x="9" y="15" width="6" height="6" rx="1"/>
+        </svg>
+      </div>
+      <div class="card-label">Projects</div>
+      <div class="card-desc">Vista general de proyectos activos y su progreso</div>
+      <div class="card-arrow">Abrir →</div>
+    </a>
+
+    <a class="card card-complete" href="https://app.smartsheet.com/sheets/fGvpW3GhW9PHgXjvX64RC52qFr6rpHfH98g535p1?view=grid" target="_blank">
+      <div class="card-corner"></div>
+      <div class="card-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div class="card-label">Complete</div>
+      <div class="card-desc">Tickets y proyectos finalizados y cerrados</div>
+      <div class="card-arrow">Abrir →</div>
+    </a>
+
+  </div>
+
+  <!-- ROLES -->
+  <div class="section-label">Roles del sistema</div>
+  <div class="roles-grid">
+    <div class="role-card">
+      <div class="role-avatar">🪖</div>
+      <div>
+        <div class="role-name">Foreman</div>
+        <div class="role-tag">Supervisión de campo</div>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-avatar">🦺</div>
+      <div>
+        <div class="role-name">Safety Rep</div>
+        <div class="role-tag">Control de seguridad</div>
+      </div>
+    </div>
+    <div class="role-card">
+      <div class="role-avatar">📋</div>
+      <div>
+        <div class="role-name">Constr. Mgr</div>
+        <div class="role-tag">Gestión de proyectos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="status-bar">
+    <div class="status-dot"></div>
+    <div class="status-text"><strong>Sistema activo</strong> — GEO-CX QA Pipeline</div>
+    <div class="status-spacer"></div>
+    <div class="status-version">v2025 · QA DASHBOARD</div>
+  </div>
+
+</div>
+</body>
+</html>
